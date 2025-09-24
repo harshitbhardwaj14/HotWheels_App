@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block body %}
+<h2>Add a New Car</h2>
+
+<form method="post" enctype="multipart/form-data">
+  <label>Car Name:</label><br>
+  <input name="name" placeholder="Car name" required><br><br>
+
+  <label>Notes:</label><br>
+  <textarea name="notes" placeholder="Any notes about this car"></textarea><br><br>
+
+  <label>Upload Photo:</label><br>
+  <input type="file" name="image" accept="image/*" required><br><br>
+
+  <button type="submit">Add Car</button>
+</form>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block body %}
+<h2>{{ car.name }}</h2>
+<img src="{{ url_for('static', filename='uploads/' ~ car.image_filename) }}" style="max-width:70%">
+<p><strong>Notes:</strong> {{ car.notes }}</p>
+<p><strong>Added:</strong> {{ car.added_at.strftime('%Y-%m-%d %H:%M') }}</p>
+<button id="moreInfo">Get more info</button>
+<pre id="moreResult"></pre>
+<script>
+document.getElementById('moreInfo').onclick = async () => {
+  const res = await fetch('{{ url_for('car_more', car_id=car.id) }}');
+  const j = await res.json();
+  document.getElementById('moreResult').textContent = j.info || 'No info';
+};
+</script>
+{% endblock %}

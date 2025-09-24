@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>HotWheels Collection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+  <h1>HotWheels Collection</h1>
+  <div>
+    {% if session.get('user_id') %}
+      <a href="{{ url_for('collection') }}">Collection</a> |
+      <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Login</a> |
+      <a href="{{ url_for('signup') }}">Sign up</a>
+    {% endif %}
+  </div>
+</header>
+<hr>
+{% block body %}{% endblock %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
