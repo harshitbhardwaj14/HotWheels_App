@@ -2,7 +2,20 @@
 
 {% block body %}
 <div class="max-w-7xl mx-auto px-4 py-10">
-  <h2 class="text-3xl font-semibold text-white mb-6 text-center">Your HotWheels Collection</h2>
+
+  <!-- Top Bar -->
+  <div class="flex justify-between items-center mb-8 glass p-4 rounded-2xl shadow-lg">
+    <!-- Left: Dashboard -->
+    <h2 class="text-2xl font-semibold text-white">{{ user.username }} Dashboard</h2>
+
+    <!-- Right: Username + Logout -->
+    <div class="flex items-center space-x-4">
+      <a href="{{ url_for('logout') }}" 
+         class="px-4 py-2 bg-red-500/80 text-white rounded-xl hover:bg-red-600/80 transition">
+        Logout
+      </a>
+    </div>
+  </div>
 
   <!-- Add Car Form -->
   <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" 
