@@ -159,3 +159,7 @@ def delete_car(car_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)

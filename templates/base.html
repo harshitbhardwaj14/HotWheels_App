@@ -1,25 +1,45 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>HotWheels Collection</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HotWheels Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Frosted glass effect */
+        .glass {
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .thumb {
+            border-radius: 0.75rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .thumb:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+    </style>
 </head>
-<body>
-<header>
-  <h1>HotWheels Collection</h1>
-  <div>
-    {% if session.get('user_id') %}
-      <a href="{{ url_for('collection') }}">Collection</a> |
-      <a href="{{ url_for('logout') }}">Logout</a>
-    {% else %}
-      <a href="{{ url_for('login') }}">Login</a> |
-      <a href="{{ url_for('signup') }}">Sign up</a>
-    {% endif %}
-  </div>
-</header>
-<hr>
-{% block body %}{% endblock %}
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<body class="bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 min-h-screen flex flex-col">
+    <header class="p-4 flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">🏎️ HotWheels Collection</h1>
+        {% if session.user_id %}
+        <a href="{{ url_for('logout') }}" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">Logout</a>
+        {% endif %}
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-6">
+        {% block body %}{% endblock %}
+    </main>
+
+    <footer class="p-4 text-center text-gray-600">
+        &copy; 2025 HotWheels Collection
+    </footer>
 </body>
 </html>
