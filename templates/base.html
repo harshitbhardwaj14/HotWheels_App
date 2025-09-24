@@ -1,45 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HotWheels Collection</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Frosted glass effect */
-        .glass {
-            backdrop-filter: blur(10px) saturate(180%);
-            -webkit-backdrop-filter: blur(10px) saturate(180%);
-            background-color: rgba(255, 255, 255, 0.25);
-            border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HotWheels Collection</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        .thumb {
-            border-radius: 0.75rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+  <!-- Google Font (San Francisco style) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        .thumb:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-    </style>
+  <style>
+     html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #111, #000);
+    color: white;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #111, #000);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* ensures it stays fixed when scrolling */
+  }
+
+    /* Glass effect for any container */
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
+    }
+
+    input, button {
+      font-family: 'Inter', sans-serif;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Button hover glass */
+    button:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 min-h-screen flex flex-col">
-    <header class="p-4 flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-gray-800">🏎️ HotWheels Collection</h1>
-        {% if session.user_id %}
-        <a href="{{ url_for('logout') }}" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">Logout</a>
-        {% endif %}
-    </header>
-
-    <main class="flex-grow container mx-auto px-4 py-6">
-        {% block body %}{% endblock %}
-    </main>
-
-    <footer class="p-4 text-center text-gray-600">
-        &copy; 2025 HotWheels Collection
-    </footer>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+  {% block body %}{% endblock %}
 </body>
 </html>

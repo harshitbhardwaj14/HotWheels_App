@@ -1,16 +1,44 @@
 {% extends 'base.html' %}
+
 {% block body %}
-<h2>{{ car.name }}</h2>
-<img src="{{ url_for('static', filename='uploads/' ~ car.image_filename) }}" style="max-width:70%">
-<p><strong>Notes:</strong> {{ car.notes }}</p>
-<p><strong>Added:</strong> {{ car.added_at.strftime('%Y-%m-%d %H:%M') }}</p>
-<button id="moreInfo">Get more info</button>
-<pre id="moreResult"></pre>
+<div class="flex flex-col items-center justify-center min-h-screen p-4 glass">
+
+  <!-- Car Card -->
+  <div class="glass p-6 rounded-2xl shadow-xl flex flex-col lg:flex-row items-center lg:items-start w-full sm:w-3/4 gap-6 justify-center">
+
+    <!-- Car Image -->
+    <img src="{{ url_for('static', filename='uploads/' ~ car.image_filename) }}" 
+         alt="{{ car.name }}" 
+         class="rounded-xl shadow-lg w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 object-cover flex-shrink-0">
+
+    <!-- Car Details -->
+    <div class="flex flex-col flex-1 text-center lg:text-left gap-3">
+
+      <h2 class="text-3xl font-bold text-white">{{ car.name }}</h2>
+      
+      <p class="text-white/70"><strong>Notes:</strong> {{ car.notes or 'No notes' }}</p>
+      <p class="text-white/70"><strong>Added:</strong> {{ car.added_at.strftime('%Y-%m-%d %H:%M') }}</p>
+
+      <button id="moreInfo" 
+              class="px-4 py-2 bg-white/20 text-white font-semibold rounded-xl shadow-lg hover:bg-white/30 transition w-full sm:w-auto">
+        Get More Info
+      </button>
+      
+      <pre id="moreResult" class="text-white/80 bg-white/10 p-4 rounded-xl w-full h-32 overflow-auto whitespace-pre-wrap"><p>Click "Get More Info" to generate more infomation</p></pre>
+
+    </div>
+  </div>
+  <a href="{{ url_for('collection') }}" 
+         class="px-6 py-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition w-full sm:w-auto text-center mt-6">
+         ← Back to Collection
+      </a>
+</div>
+
 <script>
 document.getElementById('moreInfo').onclick = async () => {
-  const res = await fetch('{{ url_for('car_more', car_id=car.id) }}');
-  const j = await res.json();
-  document.getElementById('moreResult').textContent = j.info || 'No info';
+    const res = await fetch('{{ url_for('car_more', car_id=car.id) }}');
+    const j = await res.json();
+    document.getElementById('moreResult').textContent = j.info || 'No info available.';
 };
 </script>
 {% endblock %}
