@@ -66,16 +66,26 @@
   {% endif %}
 
   <!-- Floating Search Bar -->
-  <div
-    class="fixed bottom-6 left-1/2 transform -translate-x-1/2 max-w-lg sm:w-1/2 glass px-4 py-2 rounded-2xl shadow-xl flex items-center space-x-3">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
-    </svg>
-    <input id="searchInput" type="text" placeholder="Search your cars..."
-      class="w-full bg-transparent text-white placeholder-white/80 input-bold outline-none">
+  <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3 max-w-lg w-full px-4">
+    <!-- Search Bar -->
+    <div class="flex-1 glass px-4 py-2 rounded-2xl shadow-xl flex items-center space-x-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
+      </svg>
+      <input id="searchInput" type="text" placeholder="Search your cars..."
+        class="w-full bg-transparent text-white placeholder-white/80 input-bold outline-none">
+    </div>
+
+    <!-- Feed Button -->
+    <a href=""
+      class="flex glass px-4 py-2 rounded-2xl shadow-xl flex items-center space-x-3">
+      Feed
+    </a>
   </div>
+
+
 </div>
 
 <!-- Search Script -->

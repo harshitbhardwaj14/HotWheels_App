@@ -43,6 +43,16 @@ class Car(Base):
     added_at = Column(DateTime, default=datetime.utcnow)
     owner = relationship('User', back_populates='cars')
 
+class PublishedCar(Base):
+    __tablename__ = 'published_cars'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    name = Column(String(256))
+    image_filename = Column(String(512))
+    notes = Column(Text)
+    likes = Column(Integer, default=0)
+    added_at = Column(DateTime, default=datetime.utcnow)
+
 Base.metadata.create_all(engine)
 
 # Helpers
