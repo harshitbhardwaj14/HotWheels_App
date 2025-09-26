@@ -5,7 +5,6 @@
 
   <!-- Car Card -->
   <div class="glass p-6 rounded-2xl shadow-xl flex flex-col lg:flex-row items-center lg:items-start w-full sm:w-3/4 gap-6 justify-center">
-
     <!-- Car Image -->
     <img src="{{ url_for('static', filename='uploads/' ~ car.image_filename) }}" 
          alt="{{ car.name }}" 
@@ -13,9 +12,7 @@
 
     <!-- Car Details -->
     <div class="flex flex-col flex-1 text-center lg:text-left gap-3">
-
       <h2 class="text-3xl font-bold text-white">{{ car.name }}</h2>
-      
       <p class="text-white/70"><strong>Notes:</strong> {{ car.notes or 'No notes' }}</p>
       <p class="text-white/70"><strong>Added:</strong> {{ car.added_at.strftime('%Y-%m-%d %H:%M') }}</p>
 
@@ -24,14 +21,47 @@
         Get More Info
       </button>
       
-      <pre id="moreResult" class="text-white/80 bg-white/10 p-4 rounded-xl w-full h-32 overflow-auto whitespace-pre-wrap"><p>Click "Get More Info" to generate more infomation</p></pre>
-
+      <pre id="moreResult" class="text-white/80 bg-white/10 p-4 rounded-xl w-full h-32 overflow-auto whitespace-pre-wrap">
+Click "Get More Info" to generate more information
+      </pre>
     </div>
   </div>
-  <a href="{{ url_for('collection') }}" 
-         class="px-6 py-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition w-full sm:w-auto text-center mt-6">
-         ← Back to Collection
-      </a>
+
+  <div class="flex gap-4 mt-6 w-full sm:w-3/4 justify-center">
+    <a href="{{ url_for('collection') }}" 
+       class="px-6 py-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition text-center">
+      ← Back to Collection
+    </a>
+    <button id="openPostModal" 
+            class="px-6 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition">
+      Post
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <!-- Modal -->
+<div id="postModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+  <div class="glass p-6 rounded-2xl w-11/12 sm:w-1/2 shadow-xl">
+    <h2 class="text-xl font-bold text-white mb-4">Post this car</h2>
+    <form action="{{ url_for('post_to_feed', car_id=car.id) }}" method="post">
+      <textarea name="description" 
+                placeholder="Write something about this car..." 
+                class="w-full p-3 rounded-xl border border-white/30 bg-white/10 text-white placeholder-white/60 mb-4"></textarea>
+      <div class="flex justify-end gap-4">
+        <button type="button" id="closeModal" 
+                class="px-4 py-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition">
+          Cancel
+        </button>
+        <button type="submit" 
+                class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition">
+          Post
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 </div>
 
 <script>
@@ -40,5 +70,10 @@ document.getElementById('moreInfo').onclick = async () => {
     const j = await res.json();
     document.getElementById('moreResult').textContent = j.info || 'No info available.';
 };
+
+// Modal functionality
+const modal = document.getElementById('postModal');
+document.getElementById('openPostModal').onclick = () => modal.classList.remove('hidden');
+document.getElementById('closeModal').onclick = () => modal.classList.add('hidden');
 </script>
 {% endblock %}

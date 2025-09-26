@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto mt-10 space-y-6">
+  {% for post in posts %}
+    <div class="bg-white shadow-md rounded-2xl p-4">
+      <h2 class="text-lg font-bold">{{ post.car.name }}</h2>
+      <img src="{{ url_for('static', filename='uploads/' ~ post.car.image_filename) }}" 
+           alt="{{ post.car.name }}" class="rounded-xl mt-2">
+      <p class="mt-2 text-gray-600">{{ post.description }}</p>
+
+      <form action="{{ url_for('like', post_id=post.id) }}" method="post" class="mt-3">
+        <button type="submit" 
+                class="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600">
+          ❤️ Like
+        </button>
+      </form>
+      <p class="mt-1 text-sm text-gray-700">Likes: {{ post.likes }}</p>
+    </div>
+  {% else %}
+    <p class="text-center text-gray-500">No posts yet. Post a car to see it here!</p>
+  {% endfor %}
+</div>
+{% endblock %}
