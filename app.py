@@ -163,3 +163,21 @@ if __name__ == '__main__':
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+from flask import render_template, request, redirect, url_for
+from models import Car # Assuming models.py contains the Car model and database setup
+from flask_login import login_required, current_user
+
+@app.route("/collection", methods=["GET"])
+@login_required
+def collection():
+    query = request.args.get("q", "").strip().lower()
+
+    # Fetch cars of the logged-in user
+    cars = Car.query.filter_by(user_id=current_user.id).all()
+
+    if query:
+        cars = [car for car in cars if query in car.name.lower() or query in (car.notes or "").lower()]
+
+    return render_template("collection.html", cars=cars, user=current_user)
+
