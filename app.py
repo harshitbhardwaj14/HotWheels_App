@@ -38,6 +38,8 @@ class User(db.Model):
     cars = db.relationship("Car", back_populates="owner")
     posts = db.relationship("FeedPost", back_populates="user")
 
+    posts = db.relationship("FeedPost", back_populates="user")
+
 
 class FeedPost(db.Model):
     __tablename__ = "feed_posts"
@@ -48,7 +50,7 @@ class FeedPost(db.Model):
     likes = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    car = db.relationship("Car", back_populates="feed_posts")
+    car = db.relationship("Car")
     user = db.relationship("User", back_populates="posts")
 
 
@@ -200,17 +202,15 @@ def car_more(car_id):
 # Post a car to the feed (from car detail)
 @app.route("/post_to_feed/<int:car_id>", methods=["POST"])
 def post_to_feed(car_id):
-    user = get_current_user()
+    car = Car.query.get_or_404(car_id)
+    user = get_current_user()  # must set the user
     if not user:
         return redirect(url_for("login"))
 
-    car = Car.query.get_or_404(car_id)
-    description = request.form.get("description", "")
-
-    post = FeedPost(car_id=car.id, user_id=user.id, description=description)
+    desc = request.form.get("description", "")
+    post = FeedPost(car_id=car.id, user_id=user.id, description=desc)
     db.session.add(post)
     db.session.commit()
-
     return redirect(url_for("feed"))
 
 
@@ -218,8 +218,8 @@ def post_to_feed(car_id):
 @app.route("/feed")
 def feed():
     posts = FeedPost.query.order_by(FeedPost.created_at.desc()).all()
-    # each post has .car and .user relationship available in template
-    return render_template("feed.html", posts=posts, user=get_current_user())
+    return render_template("feed.html", posts=posts)
+
 
 # Like a post (increments)
 @app.route("/like/<int:post_id>", methods=["POST"])
@@ -235,13 +235,29 @@ def like(post_id):
     db.session.commit()
     return redirect(url_for("feed"))
 
-@app.route('/delete_car/<int:car_id>', methods=['POST'])
+
+@app.route('/delete/<int:car_id>', methods=['POST'])
 def delete_car(car_id):
-    car = db_session.query(Car).filter_by(id=car_id).first()
-    if car:
-        db_session.delete(car)
-        db_session.commit()
+    user = get_current_user()
+    if not user:
+        return 'Not logged in', 401
+
+    # Use db.query, not db_session
+    car = db.query(Car).filter_by(id=car_id, user_id=user.id).first()
+    if not car:
+        return 'Car not found', 404
+
+    # Delete image file
+    try:
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], car.image_filename))
+    except FileNotFoundError:
+        pass
+
+    db.delete(car)
+    db.commit()
+
     return redirect(url_for('collection'))
+
 
 
 # -------------------- Run --------------------
