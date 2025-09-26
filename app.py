@@ -35,36 +35,34 @@ class User(db.Model):
     username = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
 
-    cars = db.relationship("Car", back_populates="owner")
-    posts = db.relationship("FeedPost", back_populates="user")
-
-    posts = db.relationship("FeedPost", back_populates="user")
-
-
-class FeedPost(db.Model):
-    __tablename__ = "feed_posts"
-    id = db.Column(db.Integer, primary_key=True)
-    car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    likes = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    car = db.relationship("Car")
-    user = db.relationship("User", back_populates="posts")
+    cars = db.relationship("Car", back_populates="owner", cascade="all, delete-orphan")
+    posts = db.relationship("FeedPost", back_populates="user", cascade="all, delete-orphan")
 
 
 class Car(db.Model):
     __tablename__ = "cars"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     name = db.Column(db.String(256), nullable=False)
     image_filename = db.Column(db.String(512), nullable=False)
     notes = db.Column(db.Text, default="")
     added_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     owner = db.relationship("User", back_populates="cars")
-    feed_posts = db.relationship("FeedPost", back_populates="car")
+    feed_posts = db.relationship("FeedPost", back_populates="car", cascade="all, delete-orphan")
+
+
+class FeedPost(db.Model):
+    __tablename__ = "feed_posts"
+    id = db.Column(db.Integer, primary_key=True)
+    car_id = db.Column(db.Integer, db.ForeignKey("cars.id", ondelete="CASCADE"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    likes = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    car = db.relationship("Car", back_populates="feed_posts")
+    user = db.relationship("User", back_populates="posts")
 
 
 # Create tables
@@ -202,10 +200,13 @@ def car_more(car_id):
 # Post a car to the feed (from car detail)
 @app.route("/post_to_feed/<int:car_id>", methods=["POST"])
 def post_to_feed(car_id):
-    car = Car.query.get_or_404(car_id)
-    user = get_current_user()  # must set the user
+    user = get_current_user()
     if not user:
         return redirect(url_for("login"))
+    
+    car = Car.query.filter_by(id=car_id, user_id=user.id).first()
+    if not car:
+        return "Car not found", 404
 
     desc = request.form.get("description", "")
     post = FeedPost(car_id=car.id, user_id=user.id, description=desc)
@@ -217,8 +218,14 @@ def post_to_feed(car_id):
 # Feed listing (public to all)
 @app.route("/feed")
 def feed():
-    posts = FeedPost.query.order_by(FeedPost.created_at.desc()).all()
-    return render_template("feed.html", posts=posts)
+    # FIXED: Added eager loading to prevent N+1 query issues
+    posts = FeedPost.query.options(
+        db.joinedload(FeedPost.user),
+        db.joinedload(FeedPost.car)
+    ).order_by(FeedPost.created_at.desc()).all()
+    
+    user = get_current_user()
+    return render_template("feed.html", posts=posts, user=user)
 
 
 # Like a post (increments)
@@ -242,22 +249,43 @@ def delete_car(car_id):
     if not user:
         return 'Not logged in', 401
 
-    # Use db.query, not db_session
-    car = db.query(Car).filter_by(id=car_id, user_id=user.id).first()
+    # FIXED: First delete associated feed posts, then delete the car
+    car = db.session.query(Car).filter_by(id=car_id, user_id=user.id).first()
     if not car:
         return 'Car not found', 404
 
+    # Delete associated feed posts first
+    FeedPost.query.filter_by(car_id=car_id).delete()
+    
     # Delete image file
     try:
         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], car.image_filename))
     except FileNotFoundError:
         pass
 
-    db.delete(car)
-    db.commit()
+    # Now delete the car
+    db.session.delete(car)
+    db.session.commit()
 
+    flash('Car deleted successfully', 'success')
     return redirect(url_for('collection'))
 
+
+# Add delete post route
+@app.route('/post/<int:post_id>/delete', methods=['POST'])
+def delete_post(post_id):
+    user = get_current_user()
+    if not user:
+        return 'Not logged in', 401
+
+    post = FeedPost.query.filter_by(id=post_id, user_id=user.id).first()
+    if not post:
+        return 'Post not found', 404
+
+    db.session.delete(post)
+    db.session.commit()
+    flash('Post deleted successfully', 'success')
+    return redirect(url_for('feed'))
 
 
 # -------------------- Run --------------------
